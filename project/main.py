@@ -24,11 +24,11 @@ def function(filePath, command):
     elif command == "Run File":
         with open(filePath) as file:
             exec(file.read())
-    elif command == "append text to the file":
-        with open(string1, "a") as file:
-            file.write(input(""))
-    elif command == "delete file":
-        os.remove(string1)
+    #elif command == "append text to the file":
+        #with open(string1, "a") as file:
+            #file.write(input(""))
+    #elif command == "delete file":
+        #os.remove(string1)
 
 
 
