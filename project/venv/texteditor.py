@@ -3,7 +3,7 @@ import idlelib.percolator as ip
 import re
 from tkinter import *
 from tkinter import ttk
-from tkdnd import DND_FILES, TkinterDnD
+import tkinterDnD as TkinterDnD
 import tkinter as tkinter
 import functools
 import operator
@@ -30,7 +30,14 @@ def function(filePath, command):
     #elif command == "delete file":
         #os.remove(string1)
 
+def drop(event):
+    # This function is called, when stuff is dropped into a widget
+    stringvar.set(event.data)
 
+def drag_command(event):
+    # This function is called at the start of the drag,
+    # it returns the drag type, the content type, and the actual content
+    return (tkinterDnD.COPY, "DND_Text", "Some nice dropped text!")
 
 
 win = TkinterDnD.Tk()
@@ -42,8 +49,9 @@ win.title('Text Editor')
 lb = tkinter.Listbox(mainframe, height=20)
 lb.config(background='#009F9F')
 # register the listbox as a drop target
-lb.drop_target_register(DND_FILES)
-lb.dnd_bind('<<Drop>>', lambda e: lb.insert(0, e.data))
+lb.register_drop_target("*")
+lb.bind("<<Drop>>", drop)
+lb.bind('<<Drop>>', lambda e: lb.insert(0, e.data))
 lb.bind('<Double-1>', lambda i: entry.insert(0, convertTuple(lb.get(lb.curselection()))))
 def convertTuple(tup):
     entry.delete(0, 'end')
@@ -91,7 +99,9 @@ def get_data():
         entry.delete(0)
         entry.delete((len(entry.get())-1))
         function(entry.get(), "print file contents")
-    elif entry.get().lower().endswith(('.py')):
+    elif entry.get().lower().endswith(('.py}')):
+        entry.delete(0)
+        entry.delete((len(entry.get()) - 1))
         function(entry.get(), "print file contents")
         ip.Percolator(text).insertfilter(cdg)
 def save():
