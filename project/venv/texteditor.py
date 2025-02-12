@@ -1,10 +1,9 @@
 import idlelib.colorizer as ic
 import idlelib.percolator as ip
 import re
-from tkinter import *
 from tkinter import ttk
 import tkinterDnD as TkinterDnD
-import tkinter as tkinter
+import tkinter as tk
 import functools
 import operator
 import subprocess
@@ -42,62 +41,6 @@ def drag_command(event):
     # it returns the drag type, the content type, and the actual content
     return (tkinterDnD.COPY, "DND_Text", "Some nice dropped text!")
 
-
-win = TkinterDnD.Tk()
-mainframe = tkinter.Frame(win)
-mainframe.pack(fill=tkinter.BOTH, expand=True)
-win.geometry("400x400")
-
-
-win.title('Text Editor')
-lb = tkinter.Listbox(mainframe)
-lb.config(background='#009F9F')
-# register the listbox as a drop target
-lb.register_drop_target("*")
-lb.bind('<<Drop>>', drop)
-lb.bind('<Double-1>', lambda i: entry.insert(0, convertTuple(lb.get(lb.curselection()))))
-def convertTuple(tup):
-    entry.delete(0, 'end')
-    return ''.join([str(x) for x in tup])
-
-
-get_content = lb.get(2)
-print(lb.get(0))
-
-
-lb.grid(row=1, column=0, sticky = 'NSEW')
-
-
-
-
-mainframe.grid_propagate(True)
-# implement stretchability
-
-
-# create a Text widget
-text = mainframe.txt = tkinter.Text(mainframe, background=('#cceaff'))
-mainframe.txt.grid(row=1, column=1, sticky="NSEW")
-
- # create a Scrollbar and associate it with txt
-scrollb = ttk.Scrollbar(mainframe, command=mainframe.txt.yview)
-scrollb.grid(row=1, column=2, sticky='NSEW')
-mainframe.txt['yscrollcommand'] = scrollb.set
-
-# Define a function to return the Input data
-
-
-
-# Create an Entry Widget
-entry = Entry(mainframe, width=20)
-entry.grid(row=3, column=0, sticky= 'NSEW')
-#entry2 = Entry(win, width=40 )
-#entry2.place(relx=.5,rely=.6, anchor=CENTER)
-#text = Text(mainframe, height=50, width=200, background=('#cceaff'), )
-#text.grid(row=1, column=1, sticky='NSEW')
-l = Label(mainframe, text="Drag files here")
-l.grid(row=0, column=0, sticky='NSEW')
-l1 = Label(mainframe, text="File path:")
-l1.grid(row=2,column=0, sticky='NSEW')
 def get_data():
     if entry.get().lower().endswith(('.txt')):
         print("text file")
@@ -125,15 +68,17 @@ def RunFile():
 def Fullscreen():
     global isFullscreen
     if  isFullscreen == True:
-        win.attributes('-fullscreen', False)
+        pass
+        #win.attributes('-fullscreen', False)
         #text.config(width=82)
         #lb.config(height=20)
-        isFullscreen = False
+        #isFullscreen = False
     else:
+        pass
         #lb.config(height=60)
         #text.config(width=220)
-        win.attributes('-fullscreen', True)
-        isFullscreen = True
+        #win.attributes('-fullscreen', True)
+        #isFullscreen = True
 
 cdg = ic.ColorDelegator()
 cdg.prog = re.compile(r'\b(?P<MYGROUP>tkinter)\b|' + ic.make_pat().pattern, re.S)
@@ -149,45 +94,71 @@ cdg.tagdefs['STRING'] = {'foreground': '#7F3F00', 'background': '#cceaff'}
 cdg.tagdefs['DEFINITION'] = {'foreground': '#007F7F', 'background': '#cceaff'}
 
 
+win = TkinterDnD.Tk()
+win.grid_rowconfigure(0, weight=1)
+win.grid_rowconfigure(1, weight=1)
+win.grid_rowconfigure(2, weight=1)
+win.grid_rowconfigure(3, weight=1)
+win.grid_rowconfigure(4, weight=1)
+win.grid_columnconfigure(0, weight=1)
+win.grid_columnconfigure(1, weight=1)
+win.grid_columnconfigure(2, weight=1)
+win.grid_columnconfigure(3, weight=1)
+win.grid_columnconfigure(4, weight=1)
+win.grid_columnconfigure(5, weight=1)
+win.geometry("750x500")
+
+
+win.title('Text Editor')
+lb = tk.Listbox(win)
+lb.config(background='#009F9F')
+# register the listbox as a drop target
+lb.register_drop_target("*")
+lb.bind('<<Drop>>', drop)
+lb.bind('<Double-1>', lambda i: entry.insert(0, convertTuple(lb.get(lb.curselection()))))
+def convertTuple(tup):
+    entry.delete(0, 'end')
+    return ''.join([str(x) for x in tup])
 
 
 
+lb.grid(row=1, column=0, sticky = 'nsew')
+# create a Text widget
+text = tk.Text(win, background=('#cceaff'))
+text.grid(row=1, column=1, sticky='nsew')
+ # create a Scrollbar and associate it with txt
+scrollb = ttk.Scrollbar(win, command=text.yview)
+scrollb.grid(row=1, column=2, sticky='nsew')
+text['yscrollcommand'] = scrollb.set
+# Create an Entry Widget
+entry = tk.Entry(win)
+entry.grid(row=3, column=0, sticky='nsew')
+l = tk.Label(win, text="Drag files here")
+l.grid(row=0, column=0, sticky='nsew')
+l1 = tk.Label(win, text="File path:")
+l1.grid(row=2,column=0, sticky='nsew')
+btn1 = (ttk.Button(win, text="Open file", command=get_data))
+btn1.grid(row=0, column=1, sticky='nsew')
+btn2 = (ttk.Button(win, text="Save", command=save))
+btn2.grid(row=3, column=1, sticky='nsew')
+btn3= (ttk.Button(win, text="Fullscreen", command=Fullscreen))
+btn3.grid(row=4, column=1, sticky='nsew')
+btn4= (ttk.Button(win, text="Run File", command=RunFile))
+btn4.grid(row=4, column=0, sticky='nsew')
 
-btn1 = (ttk.Button(mainframe, text="Open file", command=get_data))
-btn1.grid(row=0, column=1, sticky='NSEW')
-btn2 = (ttk.Button(mainframe, text="Save", command=save))
-btn2.grid(row=3, column=1, sticky='NSEW')
-btn3= (ttk.Button(mainframe, text="Fullscreen", command=Fullscreen))
-btn3.grid(row=4, column=1, sticky='NSEW')
-btn4= (ttk.Button(mainframe, text="Run File", command=RunFile))
-btn4.grid(row=4, column=0, sticky='NSEW')
-mainframe = tkinter.Frame(win)
-mainframe.grid_rowconfigure(0, weight=1)
-mainframe.grid_rowconfigure(1, weight=1)
-mainframe.grid_columnconfigure(0, weight=1)
-mainframe.grid_columnconfigure(1, weight=1)
-mainframe.grid_rowconfigure(2, weight=1)
-mainframe.grid_columnconfigure(2, weight=1)
-mainframe.grid_rowconfigure(3, weight=1)
-mainframe.grid_columnconfigure(3, weight=1)
-mainframe.grid_rowconfigure(4, weight=1)
-mainframe.grid_columnconfigure(4, weight=1)
-#win.resizable(False, False)
-def resize():
-    print((win.winfo_height()))
 
-    print(mainframe.winfo_children())
-    #for widget in widgets:
-        #print(widget.widgetName)
-    text.config(width=int(win.winfo_width() / 15))
-    text.config(height=int(win.winfo_height() / 20))
-    lb.config(width=int(win.winfo_width() / 20), height=int(win.winfo_height() / 20))
+win.resizable(True, True)
 
-    #print(int(win.winfo_height() / 50))
-    win.after(100, func=resize)
-resize()
-win.minsize(400, 500)
+win.minsize(750, 500)
 win.mainloop()
+
+
+
+
+
+
+
+
 
 
 
