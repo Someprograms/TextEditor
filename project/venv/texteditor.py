@@ -2,8 +2,10 @@ import idlelib.colorizer as ic
 import idlelib.percolator as ip
 import re
 import tkinter
-from tkinter import ttk, Variable
-import tkinterDnD as TkinterDnD
+from tkinter import ttk
+
+
+import tkinterDnD as tkinterDnD
 import tkinter as tk
 import functools
 import operator
@@ -107,7 +109,7 @@ cdg.tagdefs['STRING'] = {'foreground': '#7F3F00', 'background': '#cceaff'}
 cdg.tagdefs['DEFINITION'] = {'foreground': '#007F7F', 'background': '#cceaff'}
 
 
-win = TkinterDnD.Tk()
+win = tkinterDnD.Tk()
 win.grid_rowconfigure(0, weight=1)
 win.grid_rowconfigure(1, weight=100)
 win.grid_rowconfigure(2, weight=1)
