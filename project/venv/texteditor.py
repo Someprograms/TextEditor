@@ -1,7 +1,8 @@
 import idlelib.colorizer as ic
 import idlelib.percolator as ip
 import re
-from tkinter import ttk
+import tkinter
+from tkinter import ttk, Variable
 import tkinterDnD as TkinterDnD
 import tkinter as tk
 import functools
@@ -79,6 +80,18 @@ def Fullscreen():
         #text.config(width=220)
         #win.attributes('-fullscreen', True)
         #isFullscreen = True
+def Find():
+    text.tag_remove('found', '1.0', tk.END)
+    text.tag_config('found', background='yellow')
+    idx = '1.0'
+    while idx:
+        idx = text.search(textFindText.get(), idx, nocase=1, stopindex=tk.END)
+        if idx:
+            lastidx = '%s+%dc' % (idx, len(textFindText.get()))
+            text.tag_add('found', idx, lastidx)
+            idx = lastidx
+
+
 
 cdg = ic.ColorDelegator()
 cdg.prog = re.compile(r'\b(?P<MYGROUP>tkinter)\b|' + ic.make_pat().pattern, re.S)
@@ -96,17 +109,12 @@ cdg.tagdefs['DEFINITION'] = {'foreground': '#007F7F', 'background': '#cceaff'}
 
 win = TkinterDnD.Tk()
 win.grid_rowconfigure(0, weight=1)
-win.grid_rowconfigure(1, weight=1)
+win.grid_rowconfigure(1, weight=100)
 win.grid_rowconfigure(2, weight=1)
 win.grid_rowconfigure(3, weight=1)
 win.grid_rowconfigure(4, weight=1)
 win.grid_columnconfigure(0, weight=1)
 win.grid_columnconfigure(1, weight=1)
-win.grid_columnconfigure(2, weight=1)
-win.grid_columnconfigure(3, weight=1)
-win.grid_columnconfigure(4, weight=1)
-win.grid_columnconfigure(5, weight=1)
-win.geometry("750x500")
 
 
 win.title('Text Editor')
@@ -124,7 +132,7 @@ def convertTuple(tup):
 
 lb.grid(row=1, column=0, sticky = 'nsew')
 # create a Text widget
-text = tk.Text(win, background=('#cceaff'))
+text = tk.Text(win, background='#cceaff')
 text.grid(row=1, column=1, sticky='nsew')
  # create a Scrollbar and associate it with txt
 scrollb = ttk.Scrollbar(win, command=text.yview)
@@ -137,12 +145,19 @@ l = tk.Label(win, text="Drag files here")
 l.grid(row=0, column=0, sticky='nsew')
 l1 = tk.Label(win, text="File path:")
 l1.grid(row=2,column=0, sticky='nsew')
+frame = tk.Frame(win)
+frame.grid(row=0, column=1, sticky='nsew')
+frame.grid_columnconfigure(0, weight=1)
+frame.grid_rowconfigure(0, weight=1)
+frame.grid_columnconfigure(1, weight=1)
+findButton = (ttk.Button(frame, text='Find', width=20, command=Find))
+findButton.grid(row=0,column=0, sticky='nsew')
+textFindText = tk.Entry(frame, width=85)
+textFindText.grid(row=0, column=1, sticky='nsew')
 btn1 = (ttk.Button(win, text="Open file", command=get_data))
-btn1.grid(row=0, column=1, sticky='nsew')
+btn1.grid(row=4, column=1, sticky='nsew')
 btn2 = (ttk.Button(win, text="Save", command=save))
 btn2.grid(row=3, column=1, sticky='nsew')
-btn3= (ttk.Button(win, text="Fullscreen", command=Fullscreen))
-btn3.grid(row=4, column=1, sticky='nsew')
 btn4= (ttk.Button(win, text="Run File", command=RunFile))
 btn4.grid(row=4, column=0, sticky='nsew')
 
@@ -150,6 +165,7 @@ btn4.grid(row=4, column=0, sticky='nsew')
 win.resizable(True, True)
 
 win.minsize(750, 500)
+print(win.winfo_children())
 win.mainloop()
 
 
