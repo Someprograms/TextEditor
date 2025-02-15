@@ -44,20 +44,20 @@ def drag_command(event):
     # it returns the drag type, the content type, and the actual content
     return (tkinterDnD.COPY, "DND_Text", "Some nice dropped text!")
 
-def get_data():
-    if entry.get().lower().endswith(('.txt')):
+def get_data(filepath):
+    if filepath.lower().endswith(('.txt')):
         print("text file")
         #entry.delete(0)
         #entry.delete((len(entry.get())-1))
-        function(entry.get(), "print file contents")
+        function(filepath, "print file contents")
         try:
             ip.Percolator(text).removefilter(cdg)
         except:
             pass
-    elif entry.get().lower().endswith(('.py')):
+    elif filepath.lower().endswith(('.py')):
         #entry.delete(0)
         #entry.delete((len(entry.get()) - 1))
-        function(entry.get(), "print file contents")
+        function(filepath, "print file contents")
         try:
             ip.Percolator(text).insertfilter(cdg)
         except:
@@ -86,7 +86,7 @@ def Find():
     text.tag_remove('found', '1.0', tk.END)
     text.tag_config('found', background='yellow')
     idx = '1.0'
-    while idx:
+    while idx and textFindText.get()!= "":
         idx = text.search(textFindText.get(), idx, nocase=1, stopindex=tk.END)
         if idx:
             lastidx = '%s+%dc' % (idx, len(textFindText.get()))
@@ -125,7 +125,7 @@ lb.config(background='#009F9F')
 # register the listbox as a drop target
 lb.register_drop_target("*")
 lb.bind('<<Drop>>', drop)
-lb.bind('<Double-1>', lambda i: entry.insert(0, convertTuple(lb.get(lb.curselection()))))
+lb.bind('<Double-1>', lambda i: get_data(convertTuple(lb.get(lb.curselection()))))
 def convertTuple(tup):
     entry.delete(0, 'end')
     return ''.join([str(x) for x in tup])
@@ -156,8 +156,7 @@ findButton = (ttk.Button(frame, text='Find', width=20, command=Find))
 findButton.grid(row=0,column=0, sticky='nsew')
 textFindText = tk.Entry(frame, width=85)
 textFindText.grid(row=0, column=1, sticky='nsew')
-btn1 = (ttk.Button(win, text="Open file", command=get_data))
-btn1.grid(row=4, column=1, sticky='nsew')
+
 btn2 = (ttk.Button(win, text="Save", command=save))
 btn2.grid(row=3, column=1, sticky='nsew')
 btn4= (ttk.Button(win, text="Run File", command=RunFile))
