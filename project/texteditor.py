@@ -1,21 +1,18 @@
 import idlelib.colorizer as ic
 import idlelib.percolator as ip
 import re
-import tkinter
 from tkinter import ttk
-
-
 import tkinterDnD as tkinterDnD
 import tkinter as tk
-import functools
-import operator
-import subprocess
 
+currentFilepath: str = ''
 isFullscreen = False
 elementsInListbox: int = 0
 
 
 def function(filePath, command):
+    global currentFilepath
+    currentFilepath = filePath
     if command == "print file contents":
         with open(filePath, "r") as file:
             text.delete(1.0, "end")
@@ -65,9 +62,9 @@ def get_data(filepath):
 
 def save():
     print('writing to file')
-    function(entry.get(), "write to file")
+    function(currentFilepath, "write to file")
 def RunFile():
-    function(entry.get(), "Run File")
+    function(currentFilepath, "Run File")
 def Fullscreen():
     global isFullscreen
     if  isFullscreen == True:
@@ -114,7 +111,6 @@ win.grid_rowconfigure(0, weight=1)
 win.grid_rowconfigure(1, weight=100)
 win.grid_rowconfigure(2, weight=1)
 win.grid_rowconfigure(3, weight=1)
-win.grid_rowconfigure(4, weight=1)
 win.grid_columnconfigure(0, weight=1)
 win.grid_columnconfigure(1, weight=1)
 
@@ -127,7 +123,6 @@ lb.register_drop_target("*")
 lb.bind('<<Drop>>', drop)
 lb.bind('<Double-1>', lambda i: get_data(convertTuple(lb.get(lb.curselection()))))
 def convertTuple(tup):
-    entry.delete(0, 'end')
     return ''.join([str(x) for x in tup])
 
 
@@ -141,12 +136,8 @@ scrollb = ttk.Scrollbar(win, command=text.yview)
 scrollb.grid(row=1, column=2, sticky='nsew')
 text['yscrollcommand'] = scrollb.set
 # Create an Entry Widget
-entry = tk.Entry(win)
-entry.grid(row=3, column=0, sticky='nsew')
 l = tk.Label(win, text="Drag files here")
 l.grid(row=0, column=0, sticky='nsew')
-l1 = tk.Label(win, text="File path:")
-l1.grid(row=2,column=0, sticky='nsew')
 frame = tk.Frame(win)
 frame.grid(row=0, column=1, sticky='nsew')
 frame.grid_columnconfigure(0, weight=1)
@@ -160,7 +151,7 @@ textFindText.grid(row=0, column=1, sticky='nsew')
 btn2 = (ttk.Button(win, text="Save", command=save))
 btn2.grid(row=3, column=1, sticky='nsew')
 btn4= (ttk.Button(win, text="Run File", command=RunFile))
-btn4.grid(row=4, column=0, sticky='nsew')
+btn4.grid(row=3, column=0, sticky='nsew')
 
 
 win.resizable(True, True)
