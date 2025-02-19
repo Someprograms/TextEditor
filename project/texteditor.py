@@ -1,10 +1,10 @@
 import idlelib.colorizer as ic
 import idlelib.percolator as ip
 import re
-from tkinter import ttk
+from tkinter import ttk, PhotoImage
 import tkinterDnD as tkinterDnD
 import tkinter as tk
-
+from PIL import Image, ImageTk
 currentFilepath: str = ''
 isFullscreen = False
 elementsInListbox: int = 0
@@ -65,6 +65,9 @@ def save():
     function(currentFilepath, "write to file")
 def RunFile():
     function(currentFilepath, "Run File")
+def Resetfind():
+    textFindText.delete(0, 'end')
+    text.tag_remove('found', '1.0', tk.END)
 def Fullscreen():
     global isFullscreen
     if  isFullscreen == True:
@@ -141,13 +144,16 @@ l.grid(row=0, column=0, sticky='nsew')
 frame = tk.Frame(win)
 frame.grid(row=0, column=1, sticky='nsew')
 frame.grid_columnconfigure(0, weight=1)
-frame.grid_rowconfigure(0, weight=1)
-frame.grid_columnconfigure(1, weight=1)
+frame.grid_rowconfigure(0, weight=10)
+frame.grid_columnconfigure(1, weight=10)
+frame.grid_columnconfigure(2, weight=1)
 findButton = (ttk.Button(frame, text='Find', width=20, command=Find))
 findButton.grid(row=0,column=0, sticky='nsew')
 textFindText = tk.Entry(frame, width=85)
 textFindText.grid(row=0, column=1, sticky='nsew')
-
+xButtonImage = ImageTk.PhotoImage(Image.open('letter-x.png').resize(size=(20,20)))
+xButton = (ttk.Button(frame, image=xButtonImage, command=Resetfind))
+xButton.grid(row=0, column=2, sticky='nsew')
 btn2 = (ttk.Button(win, text="Save", command=save))
 btn2.grid(row=3, column=1, sticky='nsew')
 btn4= (ttk.Button(win, text="Run File", command=RunFile))
