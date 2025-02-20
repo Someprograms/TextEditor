@@ -8,6 +8,9 @@ from PIL import Image, ImageTk
 currentFilepath: str = ''
 isFullscreen = False
 elementsInListbox: int = 0
+foundstuff = []
+currentselection: int = 0
+
 
 
 def function(filePath, command):
@@ -23,23 +26,7 @@ def function(filePath, command):
     elif command == "Run File":
         with open(filePath) as file:
             exec(file.read())
-    #elif command == "append text to the file":
-        #with open(string1, "a") as file:
-            #file.write(input(""))
-    #elif command == "delete file":
-        #os.remove(string1)
 
-def drop(event):
-    global elementsInListbox
-    # This function is called, when stuff is dropped into a widget
-    lb.insert(elementsInListbox, event.data.lstrip("{").rstrip("}"))
-    elementsInListbox +=1
-
-
-def drag_command(event):
-    # This function is called at the start of the drag,
-    # it returns the drag type, the content type, and the actual content
-    return (tkinterDnD.COPY, "DND_Text", "Some nice dropped text!")
 
 def get_data(filepath):
     if filepath.lower().endswith(('.txt')):
@@ -68,21 +55,14 @@ def RunFile():
 def Resetfind():
     textFindText.delete(0, 'end')
     text.tag_remove('found', '1.0', tk.END)
-def Fullscreen():
-    global isFullscreen
-    if  isFullscreen == True:
-        pass
-        #win.attributes('-fullscreen', False)
-        #text.config(width=82)
-        #lb.config(height=20)
-        #isFullscreen = False
-    else:
-        pass
-        #lb.config(height=60)
-        #text.config(width=220)
-        #win.attributes('-fullscreen', True)
-        #isFullscreen = True
 def Find():
+    global foundstuff
+    global currentselection
+    global strvar
+    foundstuff.clear()
+    currentselection = 0
+    strvar.set(str(currentselection))
+    print(int(text.index('end-1c').split('.')[0]))
     text.tag_remove('found', '1.0', tk.END)
     text.tag_config('found', background='yellow')
     idx = '1.0'
@@ -91,10 +71,39 @@ def Find():
         if idx:
             lastidx = '%s+%dc' % (idx, len(textFindText.get()))
             text.tag_add('found', idx, lastidx)
+            foundstuff.append(int(text.index(idx).split('.')[0]) - 1)
             idx = lastidx
+    else:
+        if textFindText.get()!= '':
+            foundstuff = list(dict.fromkeys(foundstuff))
+            print(foundstuff)
 
 
+def Movetoafoundthing(moveupordown):
+    global currentselection
+    if moveupordown == 'down':
+        print(text.yview())
+        if currentselection != len(foundstuff)-1:
+            if 1.0 not in text.yview():
+                text.yview(foundstuff[currentselection+1])
+                currentselection+=1
+    if moveupordown == 'up':
+        if currentselection != 0:
+            text.yview(foundstuff[currentselection-1])
+            currentselection-=1
+    strvar.set(str(currentselection))
 
+def drop(event):
+    global elementsInListbox
+    # This function is called, when stuff is dropped into a widget
+    lb.insert(elementsInListbox, event.data.lstrip("{").rstrip("}"))
+    elementsInListbox +=1
+
+
+def drag_command(event):
+    # This function is called at the start of the drag,
+    # it returns the drag type, the content type, and the actual content
+    return (tkinterDnD.COPY, "DND_Text", "Some nice dropped text!")
 cdg = ic.ColorDelegator()
 cdg.prog = re.compile(r'\b(?P<MYGROUP>tkinter)\b|' + ic.make_pat().pattern, re.S)
 cdg.idprog = re.compile(r'\s+(\w+)', re.S)
@@ -134,34 +143,48 @@ lb.grid(row=1, column=0, sticky = 'nsew')
 # create a Text widget
 text = tk.Text(win, background='#cceaff')
 text.grid(row=1, column=1, sticky='nsew')
- # create a Scrollbar and associate it with txt
+ # create a Scrollbar and associate it with text
 scrollb = ttk.Scrollbar(win, command=text.yview)
 scrollb.grid(row=1, column=2, sticky='nsew')
 text['yscrollcommand'] = scrollb.set
-# Create an Entry Widget
 l = tk.Label(win, text="Drag files here")
 l.grid(row=0, column=0, sticky='nsew')
+
 frame = tk.Frame(win)
 frame.grid(row=0, column=1, sticky='nsew')
 frame.grid_columnconfigure(0, weight=1)
 frame.grid_rowconfigure(0, weight=10)
 frame.grid_columnconfigure(1, weight=10)
 frame.grid_columnconfigure(2, weight=1)
+frame.grid_columnconfigure(3,weight=1)
+frame.grid_columnconfigure(4, weight=1)
+frame.grid_columnconfigure(5, weight=1)
+
 findButton = (ttk.Button(frame, text='Find', width=20, command=Find))
 findButton.grid(row=0,column=0, sticky='nsew')
 textFindText = tk.Entry(frame, width=85)
 textFindText.grid(row=0, column=1, sticky='nsew')
+upbuttonimage = Image.open('arrow-up.png')
+downbuttonimage = upbuttonimage.transpose(Image.FLIP_TOP_BOTTOM)
+tkupbuttonimage = ImageTk.PhotoImage(upbuttonimage.resize(size=(20,20)))
+tkdownbuttonimage = ImageTk.PhotoImage(downbuttonimage.resize(size=(20,20)))
+upButton = (ttk.Button(frame, image=tkdownbuttonimage, command=lambda: Movetoafoundthing('down')))
+upButton.grid(row=0, column=2, sticky='nsew')
+downButton = (ttk.Button(frame, image=tkupbuttonimage, command=lambda: Movetoafoundthing('up')))
+downButton.grid(row=0, column=3, sticky='nsew')
+strvar = tk.StringVar()
+curselectlabel= tk.Label(frame, textvariable=strvar)
+curselectlabel.grid(row=0, column=4, sticky='nsew')
 xButtonImage = ImageTk.PhotoImage(Image.open('letter-x.png').resize(size=(20,20)))
 xButton = (ttk.Button(frame, image=xButtonImage, command=Resetfind))
-xButton.grid(row=0, column=2, sticky='nsew')
+xButton.grid(row=0, column=5, sticky='nsew')
+
 btn2 = (ttk.Button(win, text="Save", command=save))
 btn2.grid(row=3, column=1, sticky='nsew')
-btn4= (ttk.Button(win, text="Run File", command=RunFile))
+btn4 = (ttk.Button(win, text="Run File", command=RunFile))
 btn4.grid(row=3, column=0, sticky='nsew')
 
-
 win.resizable(True, True)
-
 win.minsize(750, 500)
 print(win.winfo_children())
 win.mainloop()
